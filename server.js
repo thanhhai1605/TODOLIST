@@ -73,15 +73,38 @@ app.post("/register", async (req, res) => {
 });
 
 // ✅ 2. Tạo task
-app.post("/tasks", async (req, res) => {
+app.post("/web/tasks", async (req, res) => {
   const { title, userId } = req.body;
 
-  const task = await Task.create({
+  await Task.create({
     title,
     userId
   });
 
-  res.send(task);
+  res.redirect("/");
+});
+
+// ✅ 8. Đánh dấu task hoàn thành
+app.post("/tasks/:id/done", async (req, res) => {
+  try {
+    await Task.findByIdAndUpdate(req.params.id, {
+      isDone: true,
+      doneAt: new Date()
+    });
+    res.redirect("/");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
+});
+
+// ✅ 9. Xóa task
+app.post("/tasks/:id/delete", async (req, res) => {
+  try {
+    await Task.findByIdAndDelete(req.params.id);
+    res.redirect("/");
+  } catch (err) {
+    res.status(500).send(err.message);
+  }
 });
 
 // ✅ 3. Get all tasks
